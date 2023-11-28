@@ -1,0 +1,22 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "preinstall": "npm link ../node_modules/react",
+    "start": "npm run build && node app/index.js",
+    "build": "npm run build-for-server && npm run build-for-client",
+    "build-for-server": "rimraf app/views && esbuild client/App.jsx --bundle --platform=node --external:react --outfile=app/views/App.js",
+    "build-for-client": "rimraf app/public && esbuild client/index.jsx --bundle --outfile=app/public/bundle.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.19.8",
+    "express": "^4.18.2",
+    "react-dom": "^18.2.0",
+    "rimraf": "^5.0.5"
+  }
+}

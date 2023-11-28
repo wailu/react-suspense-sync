@@ -1,7 +1,7 @@
 {
   "name": "react-suspense-sync",
   "version": "0.1.0",
-  "description": "",
+  "description": "Fetch on server and sync to client using Suspense",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

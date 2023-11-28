@@ -39,7 +39,7 @@ export const SuspenseSync = ({ children, asyncData }) => {
   const init = <script dangerouslySetInnerHTML={{ __html }} />;
 
   return (
-    <SuspenseSyncContext.Provider asyncData={wrappedAsyncData}>
+    <SuspenseSyncContext.Provider value={wrappedAsyncData}>
       {children}
       {init}
       {Object.keys(wrappedAsyncData).map((name) => (
