@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import PropTypes from "prop-types";
 import Cat from "./components/Cat";
+import Duck from "./components/Duck";
 import InjectState from "./components/InjectState";
 import { SuspenseSync } from "../../index";
 
@@ -19,9 +20,10 @@ const App = ({ initialState }) => {
       <body>
         <SuspenseSync asyncData={asyncData}>
           <div>Hello</div>
-          <Suspense fallback="loading cat...">
+          <Suspense fallback="loading cat... (the promise takes 2s to resolve on the server)">
             <Cat />
           </Suspense>
+          <Duck />
         </SuspenseSync>
         <InjectState name={WINDOW_INITIAL_STATE_KEY} state={initialState} />
       </body>

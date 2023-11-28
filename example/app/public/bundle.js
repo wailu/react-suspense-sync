@@ -1084,7 +1084,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState(initialState) {
+          function useState2(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1096,7 +1096,7 @@
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect2(create, deps) {
+          function useEffect3(create, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create, deps);
           }
@@ -1878,7 +1878,7 @@
           exports.useContext = useContext2;
           exports.useDebugValue = useDebugValue;
           exports.useDeferredValue = useDeferredValue;
-          exports.useEffect = useEffect2;
+          exports.useEffect = useEffect3;
           exports.useId = useId;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useInsertionEffect = useInsertionEffect;
@@ -1886,7 +1886,7 @@
           exports.useMemo = useMemo;
           exports.useReducer = useReducer;
           exports.useRef = useRef;
-          exports.useState = useState;
+          exports.useState = useState2;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -2382,9 +2382,9 @@
           if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
             __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
           }
-          var React6 = require_react();
+          var React7 = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React6.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React7.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -3989,7 +3989,7 @@
             {
               if (props.value == null) {
                 if (typeof props.children === "object" && props.children !== null) {
-                  React6.Children.forEach(props.children, function(child) {
+                  React7.Children.forEach(props.children, function(child) {
                     if (child == null) {
                       return;
                     }
@@ -12436,7 +12436,7 @@
             }
           }
           var fakeInternalInstance = {};
-          var emptyRefsObject = new React6.Component().refs;
+          var emptyRefsObject = new React7.Component().refs;
           var didWarnAboutStateAssignmentForComponent;
           var didWarnAboutUninitializedState;
           var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -24285,11 +24285,11 @@
   });
 
   // client/index.jsx
-  var import_react5 = __toESM(require_react());
+  var import_react6 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // client/App.jsx
-  var import_react4 = __toESM(require_react());
+  var import_react5 = __toESM(require_react());
   var import_prop_types3 = __toESM(require_prop_types());
 
   // client/components/Cat.jsx
@@ -24387,12 +24387,27 @@
   };
   var Cat_default = Cat;
 
-  // client/components/InjectState.jsx
+  // client/components/Duck.jsx
   var import_react3 = __toESM(require_react());
+  var Duck = () => {
+    (0, import_react3.useEffect)(() => {
+      console.log("Duck mounted~");
+    }, []);
+    const [count, setCount] = (0, import_react3.useState)(0);
+    (0, import_react3.useEffect)(() => {
+      const id = setInterval(() => setCount((count2) => count2 + 1), 500);
+      return () => clearInterval(id);
+    }, []);
+    return /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, /* @__PURE__ */ import_react3.default.createElement("div", null, "This is the duck component"), /* @__PURE__ */ import_react3.default.createElement("p", { style: { backgroundColor: count % 2 !== 0 ? "gold" : "initial" } }, "If I'm blinking it means I have been hydrated!"), /* @__PURE__ */ import_react3.default.createElement("p", null, "I should be blinking before the cat component has been loaded"));
+  };
+  var Duck_default = Duck;
+
+  // client/components/InjectState.jsx
+  var import_react4 = __toESM(require_react());
   var import_prop_types2 = __toESM(require_prop_types());
   var InjectState = ({ name, state }) => {
     const __html = `window['${name}'] = ${JSON.stringify(state)};`;
-    return /* @__PURE__ */ import_react3.default.createElement("script", { dangerouslySetInnerHTML: { __html } });
+    return /* @__PURE__ */ import_react4.default.createElement("script", { dangerouslySetInnerHTML: { __html } });
   };
   InjectState.propTypes = {
     name: import_prop_types2.default.string.isRequired,
@@ -24404,7 +24419,7 @@
   var WINDOW_INITIAL_STATE_KEY = "__APP_INITIAL_STATE__";
   var App = ({ initialState }) => {
     const { asyncData } = initialState;
-    return /* @__PURE__ */ import_react4.default.createElement("html", null, /* @__PURE__ */ import_react4.default.createElement("head", null, /* @__PURE__ */ import_react4.default.createElement("meta", { charSet: "utf-8" }), /* @__PURE__ */ import_react4.default.createElement("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }), /* @__PURE__ */ import_react4.default.createElement("title", null, "My app")), /* @__PURE__ */ import_react4.default.createElement("body", null, /* @__PURE__ */ import_react4.default.createElement(SuspenseSync, { asyncData }, /* @__PURE__ */ import_react4.default.createElement("div", null, "Hello"), /* @__PURE__ */ import_react4.default.createElement(import_react4.Suspense, { fallback: "loading cat..." }, /* @__PURE__ */ import_react4.default.createElement(Cat_default, null))), /* @__PURE__ */ import_react4.default.createElement(InjectState_default, { name: WINDOW_INITIAL_STATE_KEY, state: initialState })));
+    return /* @__PURE__ */ import_react5.default.createElement("html", null, /* @__PURE__ */ import_react5.default.createElement("head", null, /* @__PURE__ */ import_react5.default.createElement("meta", { charSet: "utf-8" }), /* @__PURE__ */ import_react5.default.createElement("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }), /* @__PURE__ */ import_react5.default.createElement("title", null, "My app")), /* @__PURE__ */ import_react5.default.createElement("body", null, /* @__PURE__ */ import_react5.default.createElement(SuspenseSync, { asyncData }, /* @__PURE__ */ import_react5.default.createElement("div", null, "Hello"), /* @__PURE__ */ import_react5.default.createElement(import_react5.Suspense, { fallback: "loading cat... (the promise takes 2s to resolve on the server)" }, /* @__PURE__ */ import_react5.default.createElement(Cat_default, null)), /* @__PURE__ */ import_react5.default.createElement(Duck_default, null)), /* @__PURE__ */ import_react5.default.createElement(InjectState_default, { name: WINDOW_INITIAL_STATE_KEY, state: initialState })));
   };
   App.propTypes = {
     initialState: import_prop_types3.default.shape({
@@ -24416,7 +24431,7 @@
   // client/index.jsx
   (0, import_client.hydrateRoot)(
     document,
-    /* @__PURE__ */ import_react5.default.createElement(import_react5.StrictMode, null, /* @__PURE__ */ import_react5.default.createElement(App_default, { initialState: window[WINDOW_INITIAL_STATE_KEY] }))
+    /* @__PURE__ */ import_react6.default.createElement(import_react6.StrictMode, null, /* @__PURE__ */ import_react6.default.createElement(App_default, { initialState: window[WINDOW_INITIAL_STATE_KEY] }))
   );
 })();
 /*! Bundled license information:

@@ -12,7 +12,7 @@ app.get("/", (_req, res) => {
   const mockFetchCatData = new Promise((resolve) => {
     setTimeout(() => {
       resolve("The cat jumps over the lazy cow");
-    }, 1500);
+    }, 2000);
   });
 
   // TODO
