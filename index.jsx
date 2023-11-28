@@ -1,4 +1,5 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, Suspense } from "react";
+import { PropTypes } from "prop-types";
 import { wrapClientSideAsyncData, wrapServerSideAsyncData } from "./utils/wrap";
 import {
   WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY,
@@ -42,10 +43,17 @@ export const SuspenseSync = ({ children, asyncData }) => {
       {children}
       {init}
       {Object.keys(wrappedAsyncData).map((name) => (
-        <SuspenseSyncScript key={name} name={name} />
+        <Suspense key={name}>
+          <SuspenseSyncScript name={name} />
+        </Suspense>
       ))}
     </SuspenseSyncContext.Provider>
   );
+};
+
+SuspenseSync.propTypes = {
+  children: PropTypes.node,
+  asyncData: PropTypes.object.isRequired,
 };
 
 const SuspenseSyncScript = ({ name }) => {
@@ -55,4 +63,8 @@ const SuspenseSyncScript = ({ name }) => {
   `.replace(/^\s+/gm, "");
 
   return <script dangerouslySetInnerHTML={{ __html }} />;
+};
+
+SuspenseSyncScript.propTypes = {
+  name: PropTypes.string.isRequired,
 };
