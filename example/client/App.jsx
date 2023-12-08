@@ -15,6 +15,7 @@ const App = ({ asyncData }) => {
         <title>My app</title>
       </head>
       <body>
+        {/* pass asyncData to SuspenseSync */}
         <SuspenseSync asyncData={asyncData}>
           <div>Hello</div>
           <Suspense fallback="loading cat... (the promise takes 2s to resolve on the server)">
