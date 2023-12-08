@@ -1,13 +1,9 @@
 {
   "name": "react-suspense-sync",
   "version": "0.1.0",
-  "description": "Fetch on server and sync to client using Suspense",
+  "description": "Fetch data on server and sync to client using Suspense",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": ["react", "suspense"],
-  "author": "",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.54.0",
