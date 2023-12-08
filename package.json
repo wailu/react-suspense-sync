@@ -3,14 +3,18 @@
   "version": "0.1.0",
   "description": "Fetch data on server and sync to client using Suspense",
   "main": "index.js",
-  "keywords": ["react", "suspense"],
+  "keywords": [
+    "react",
+    "suspense"
+  ],
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",
-    "prettier": "^3.1.0"
+    "prettier": "^3.1.0",
+    "prop-types": "^15.8.1"
   },
   "peerDependencies": {
     "react": "^18.2.0"
