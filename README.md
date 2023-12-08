@@ -2,6 +2,10 @@
 
 Fetch data on server and sync it to the client using Suspense.
 
+```
+npm install react-suspense-sync
+```
+
 ## Background
 
 For a deep dive into the topic, you can refer to this [discussion](https://github.com/reactwg/react-18/discussions/37). The following is a brief introduction to the technology/technique.
@@ -21,7 +25,7 @@ What this means essentially is that we can start the fetch on the server but do 
 
 However, one caveat is that the data fetching solution needs to be integrated with Suspense for this to work correctly. Currently, outside of React Server Components (in the future) or the big frameworks like Next.js or Remix, integrating with this new Suspense mechanism on the server and client has no widespread support yet.
 
-## Introduction
+## Usage
 
 React Suspense Sync provides a simple solution for your SSR react app to **fetch data on server and sync it to the client later on**, enabling you to start streaming HTML earlier to the client.
 
@@ -96,6 +100,33 @@ app.get("/", (_req, res) => {
   pipe(res);
 });
 ```
+
+## Running the example app
+1. Clone the repo
+
+```
+git clone git@github.com:wailu/react-syspense-sync.git
+```
+
+2. Run npm install
+
+```
+cd react-suspense-sync && npm i
+cd example && npm i
+```
+
+3. Start the app
+   
+```
+npm run start
+```
+
+The scripts has been set up to automatically build the app and start the server.
+
+4. Go to http://localhost:3000/
+
+https://github.com/wailu/react-syspense-sync/assets/42461097/cfdcbd63-2a9a-4de1-bc5f-fe1009a1564f
+
 
 ## TODO
 
