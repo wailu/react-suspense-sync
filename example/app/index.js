@@ -15,10 +15,9 @@ app.get("/", (_req, res) => {
     }, 2000);
   });
 
-  // TODO
   const { pipe } = renderToPipeableStream(
     React.createElement(App.default, {
-      initialState: { asyncData: { mockFetchCatData } },
+      asyncData: { mockFetchCatData },
     }),
     {
       bootstrapScripts: ["public/bundle.js"],

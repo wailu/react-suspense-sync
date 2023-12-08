@@ -4,7 +4,7 @@ import { wrapClientSideAsyncData, wrapServerSideAsyncData } from "./utils/wrap";
 import {
   WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY,
   WINDOW_SUSPENSE_SYNC_DATA_KEY,
-  WINDOW_SUSPENSE_SYNC_FUNC_KEY,
+  WINDOW_SUSPENSE_SYNC_FOR_CLIENT_WRAP_KEY,
 } from "./constants";
 
 const SuspenseSyncContext = createContext({});
@@ -19,29 +19,53 @@ export const useSuspenseSync = (name) => {
   return p.data;
 };
 
-export const SuspenseSync = ({ children, asyncData }) => {
-  const wrappedAsyncData = (
-    typeof window === "undefined"
-      ? wrapServerSideAsyncData
-      : wrapClientSideAsyncData
-  )(asyncData);
-
+const InitScriptOne = () => {
   const __html = `
   window['${WINDOW_SUSPENSE_SYNC_DATA_KEY}'] = {};
   window['${WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY}'] = {};
-  window['${WINDOW_SUSPENSE_SYNC_FUNC_KEY}'] = function (name, data) {
-    window['${WINDOW_SUSPENSE_SYNC_DATA_KEY}'][name] = data;
-    const cb = window['${WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY}'][name];
-    if (cb) cb(data);
-  }
   `.replace(/^\s+/gm, "");
 
-  const init = <script dangerouslySetInnerHTML={{ __html }} />;
+  return <script dangerouslySetInnerHTML={{ __html }} />;
+};
+
+const InitScriptTwo = ({ asyncData }) => {
+  // on the client side, asyncData is not passed as prop
+  // server instead sends a script that initialises it
+  if (typeof window !== "undefined") {
+    return (
+      <script
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: "" }}
+      />
+    );
+  }
+
+  const __html = `
+    window['${WINDOW_SUSPENSE_SYNC_FOR_CLIENT_WRAP_KEY}'] = ${JSON.stringify(
+      asyncData,
+    )};
+  `.replace(/^\s+/gm, "");
+
+  return <script dangerouslySetInnerHTML={{ __html }} />;
+};
+
+InitScriptTwo.propTypes = {
+  asyncData: PropTypes.object,
+};
+
+export const SuspenseSync = ({ children, asyncData }) => {
+  const wrappedAsyncData =
+    typeof window === "undefined"
+      ? wrapServerSideAsyncData(asyncData)
+      : wrapClientSideAsyncData(
+          window[WINDOW_SUSPENSE_SYNC_FOR_CLIENT_WRAP_KEY],
+        );
 
   return (
     <SuspenseSyncContext.Provider value={wrappedAsyncData}>
       {children}
-      {init}
+      <InitScriptOne />
+      <InitScriptTwo asyncData={asyncData} />
       {Object.keys(wrappedAsyncData).map((name) => (
         <Suspense key={name}>
           <SuspenseSyncScript name={name} />
@@ -53,13 +77,17 @@ export const SuspenseSync = ({ children, asyncData }) => {
 
 SuspenseSync.propTypes = {
   children: PropTypes.node,
-  asyncData: PropTypes.object.isRequired,
+  asyncData: PropTypes.object,
 };
 
 const SuspenseSyncScript = ({ name }) => {
   const data = useSuspenseSync(name);
   const __html = `
-  window['${WINDOW_SUSPENSE_SYNC_FUNC_KEY}'](${JSON.stringify(data)});
+  (() => {
+    window['${WINDOW_SUSPENSE_SYNC_DATA_KEY}'][name] = ${JSON.stringify(data)};
+    const cb = window['${WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY}'][name];
+    if (cb) cb(data);
+  })();
   `.replace(/^\s+/gm, "");
 
   return <script dangerouslySetInnerHTML={{ __html }} />;

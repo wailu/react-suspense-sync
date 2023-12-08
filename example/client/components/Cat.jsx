@@ -9,10 +9,10 @@ const Cat = () => {
   }, []);
 
   return (
-    <>
+    <div style={{ border: "1px solid black", margin: "4px 0", padding: 4 }}>
       <div>This is the cat component</div>
       <p>{data}</p>
-    </>
+    </div>
   );
 };
 
