@@ -4,8 +4,6 @@ import Cat from "./components/Cat";
 import Duck from "./components/Duck";
 import { SuspenseSync } from "../../index";
 
-export const WINDOW_INITIAL_STATE_KEY = "__APP_INITIAL_STATE__";
-
 const App = ({ asyncData }) => {
   return (
     <html>
