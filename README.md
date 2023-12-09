@@ -8,7 +8,7 @@ npm install react-suspense-sync
 
 ## Background
 
-For a deep dive into the topic, you can refer to this [discussion](https://github.com/reactwg/react-18/discussions/37). The following is a brief introduction to the technology/technique.
+For a deep dive into the topic, you can refer to this [discussion](https://github.com/reactwg/react-18/discussions/37). The following is only a brief introduction.
 
 Server-side rendering (SSR) allows you to generate HTML from React components on the server, to be sent to the client. In React, SSR always happens in several steps:
 
@@ -17,21 +17,22 @@ Server-side rendering (SSR) allows you to generate HTML from React components on
 3. On the client, load the JavaScript code for the entire app.
 4. On the client, hydrate the server-rendered HTML for the entire app.
 
-In the past however, this is done in a waterfall approach; each step had to finish before the next step is initiated. This is not efficient when some parts of your app are slower than others.
+In the past however, this is done in a waterfall approach; each step had to finish before the next step is initiated. This is not efficient when some parts of your app are slower than others (which is most often the case).
 
 In React 18, `<Suspense>` enables developers to break down their apps into smaller independent units, in which these units will go through each steps independently from each other. The result is that parts of your app that are ready earlier can be made available to your users sooner.
 
-What this means essentially is that we can start the fetch on the server but do not need to wait for our data to be ready before starting to stream to the client. On the client, React will render the fallback in place of the component while the data is not ready yet.
+What this means essentially is that we can start fetching data on the server, but do not need to wait for the fetching of data to complete before starting to stream to the client. On the client, React will render the fallback in place of the component while the data is not yet available.
 
-However, one caveat is that the data fetching solution needs to be integrated with Suspense for this to work correctly. Currently, outside of React Server Components (in the future) or the big frameworks like Next.js or Remix, integrating with this new Suspense mechanism on the server and client has no widespread support yet.
+However, one caveat is that the data fetching solution needs to be integrated with Suspense for this to work correctly. Currently, outside of the big frameworks like [Next.js](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#streaming-with-suspense) and [Remix](https://remix.run/docs/en/main/guides/streaming), this suspense streaming feature has no widespread or mainstream support yet.
 
 ## Usage
 
 React Suspense Sync provides a simple solution for your SSR react app to **fetch data on server and sync it to the client later on**, enabling you to start streaming HTML earlier to the client.
 
+### 1. Wrap with `<SuspenseSync>`
 ```
 import { SuspenseSync } from "react-suspense-sync";
-...
+// ...
 
 const App = ({ asyncData }) => {
   return (
@@ -40,7 +41,7 @@ const App = ({ asyncData }) => {
         ...
       </head>
       <body>
-        {/* pass promises as asyncData to SuspenseSync */}
+        {/* wrap with SuspenseSync; pass asyncData to SuspenseSync */}
         <SuspenseSync asyncData={asyncData}>
           <Suspense fallback="loading cat... (the promise takes 2s to resolve on the server)">
             <Cat />
@@ -51,10 +52,13 @@ const App = ({ asyncData }) => {
   );
 };
 
-// In the component that's dependent on that server data
-// Do remember to wrap it in Suspense when using it!
+export default App;
+```
+
+### 2. Use the `useSuspenseSync` hook in components dependent on the data
+```
 import { useSuspenseSync } from "react-suspense-sync";
-...
+// ...
 
 const Cat = () => {
   const data = useSuspenseSync("mockFetchCatData");
@@ -71,28 +75,32 @@ const Cat = () => {
   );
 };
 
+export default Cat;
 ```
+
+### 3. Initiate data fetching on the server and pass promises to your App
+
+> Note: `renderToString` does not support streaming or waiting for data; you'll need to use an appropriate [streaming method](https://react.dev/reference/react-dom/server/renderToString#migrating-from-rendertostring-to-a-streaming-method-on-the-server) on the server
 
 On the server (learn more from the [official react docs](https://react.dev/reference/react-dom/server/renderToPipeableStream#rendering-a-react-tree-as-html-to-a-nodejs-stream)):
 ```
 app.get("/", (_req, res) => {
   // choose your own data fetching strategy here
   // have it return a promise that resolves to the data
+  // notice that we are not awaiting the promise
   const mockFetchCatData = new Promise((resolve) => {
     setTimeout(() => {
       resolve("The cat jumps over the lazy cow");
     }, 2000);
   });
 
-  // note: using React 18's renderToPipeableStream!!
-  // pass promise to App
+  // pass promise(s) to App via the asyncData prop (only required on the server)
   const { pipe } = renderToPipeableStream(
     React.createElement(App.default, {
-      initialState: { asyncData: { mockFetchCatData } },
+      asyncData: { mockFetchCatData },
     }),
     {
-      // add script to hydrate the server-generated HTML
-      // see: https://react.dev/reference/react-dom/server/renderToPipeableStream#rendertopipeablestream
+      // add the script that hydrates the server-generated HTML
       bootstrapScripts: ["public/bundle.js"],
     },
   );
@@ -101,14 +109,26 @@ app.get("/", (_req, res) => {
 });
 ```
 
+And how your hydration script should approximately look like:
+
+```
+import React from "react";
+import { hydrateRoot } from "react-dom/client";
+
+import App from "./App";
+
+// note that you do not need to pass asyncData here!
+hydrateRoot(document, <App />);
+```
+
 ## Running the example app
-1. Clone the repo
+1. Clone this repository
 
 ```
 git clone git@github.com:wailu/react-syspense-sync.git
 ```
 
-2. Run npm install
+2. Install dependencies
 
 ```
 cd react-suspense-sync && npm i
@@ -121,12 +141,11 @@ cd example && npm i
 npm run start
 ```
 
-The scripts has been set up to automatically build the app and start the server.
+This will automatically build the app and start the server.
 
 4. Go to http://localhost:3000/
 
-https://github.com/wailu/react-syspense-sync/assets/42461097/cfdcbd63-2a9a-4de1-bc5f-fe1009a1564f
-
+https://github.com/wailu/react-syspense-sync/assets/42461097/820ecbb6-7165-49c8-a073-c4570efa9c8e
 
 ## TODO
 
