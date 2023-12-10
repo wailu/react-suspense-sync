@@ -1,6 +1,6 @@
 {
   "name": "react-suspense-sync",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Fetch data on server and sync to client using Suspense",
   "main": "index.js",
   "keywords": [
