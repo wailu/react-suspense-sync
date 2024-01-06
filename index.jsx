@@ -16,6 +16,8 @@ export function createSuspenseSyncHook(f) {
   fetchs.push(f);
 
   return () => {
+    // TODO: detect if we're to do csr
+    // if so we fetch instead of waiting on server data
     const promises = useContext(SuspenseSyncContext);
     const p = promises[i];
 
