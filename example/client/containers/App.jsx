@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
-import Dino from "./components/Dino";
-import { SuspenseSync } from "../../index";
+import Cat from "../components/Cat";
+import Duck from "../components/Duck";
+import { SuspenseSync } from "../../../index";
 
 const App = () => {
   return (
@@ -12,9 +13,10 @@ const App = () => {
       </head>
       <body>
         <SuspenseSync>
-          <Suspense fallback="loading dino...">
-            <Dino />
+          <Suspense fallback="loading cat...">
+            <Cat />
           </Suspense>
+          <Duck />
         </SuspenseSync>
       </body>
     </html>

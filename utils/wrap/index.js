@@ -3,39 +3,47 @@ import {
   WINDOW_SUSPENSE_SYNC_DATA_KEY,
 } from "../../constants";
 
-export const wrap = (promise) => {
+// calls fetch only on server side; produces a enhanced promise
+export function wrap(fetch) {
+  if (typeof window === "undefined") return wrapForServerSide(fetch());
+  else return wrapForClientSide();
+}
+
+function innerWrap(promise) {
   const wrapped = {
     data: undefined,
-    completed: false,
+    error: undefined,
+    status: "pending",
     then: promise.then.bind(promise),
+    catch: promise.catch.bind(promise),
   };
   wrapped.then((value) => {
     wrapped.data = value;
-    wrapped.completed = true;
+    wrapped.status = "completed";
+  });
+  // TODO: handle catch properly
+  wrapped.catch((e) => {
+    wrapped.error = e;
+    wrapped.status = "error";
   });
 
   return wrapped;
-};
+}
 
-export const wrapClientSideAsyncData = (asyncData) => {
-  return Object.entries(asyncData).reduce((acc, [name]) => {
-    acc[name] = wrap(
-      new Promise((resolve) => {
-        window[WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY][name] = (data) =>
-          resolve(data);
-        if (window[WINDOW_SUSPENSE_SYNC_DATA_KEY][name]) {
-          // data streamed in before hydration, so we resolve proactively here
-          resolve(window[WINDOW_SUSPENSE_SYNC_DATA_KEY][name]);
-        }
-      }),
-    );
-    return acc;
-  }, {});
-};
+function wrapForClientSide() {
+  // the below code runs on CLIENT
+  // sets up a callback in window
+  // also check to see if data has been delivered before hydration
+  return innerWrap(
+    new Promise((resolve) => {
+      const index = window[WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY].length;
+      window[WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY][index] = resolve;
+      if (window[WINDOW_SUSPENSE_SYNC_DATA_KEY][index])
+        resolve(window[WINDOW_SUSPENSE_SYNC_DATA_KEY][index]);
+    }),
+  );
+}
 
-export const wrapServerSideAsyncData = (asyncData) => {
-  return Object.entries(asyncData).reduce((acc, [name, promise]) => {
-    acc[name] = wrap(promise);
-    return acc;
-  }, {});
-};
+function wrapForServerSide(promise) {
+  return innerWrap(promise);
+}
