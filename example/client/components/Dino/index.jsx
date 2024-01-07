@@ -22,7 +22,7 @@ const Dino = () => {
   return (
     <div style={{ border: "1px solid black", margin: "4px 0", padding: 4 }}>
       <div>This is the Dino component</div>
-      <p style={{ backgroundColor: flag ? "white" : "gold" }}>{data.title}</p>
+      <p style={{ backgroundColor: flag ? "white" : "gold" }}>{data}</p>
     </div>
   );
 };
