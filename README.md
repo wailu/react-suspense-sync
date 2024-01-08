@@ -48,11 +48,8 @@ export const useSuspenseSyncCat = createSuspenseSyncHook(fetchCatData);
 import { useSuspenseSyncCat } from "./hooks";
 
 const Cat = () => {
+  // ...
   const data = useSuspenseSyncCat();
-
-  useEffect(() => {
-    console.log("Cat mounted~");
-  }, []);
 
   return (
     <div style={{ border: "1px solid black", margin: "4px 0", padding: 4 }}>
@@ -92,7 +89,7 @@ const App = () => {
 export default App;
 ```
 
-### 4. Use in SSR
+### 4. Do SSR as per normal
 
 > Note: `renderToString` does not support streaming or waiting for data; you'll need to use an appropriate [streaming method](https://react.dev/reference/react-dom/server/renderToString#migrating-from-rendertostring-to-a-streaming-method-on-the-server) on the server
 
@@ -150,7 +147,7 @@ This will automatically build the app and start the server.
 
 https://github.com/wailu/react-syspense-sync/assets/42461097/820ecbb6-7165-49c8-a073-c4570efa9c8e
 
-5. (bonus) Try with es-build code-splitting
+5. (bonus) Try with esbuild's [code-splitting](https://esbuild.github.io/api/#splitting) feature
 
 Change the `"build"` field in `package.json`:
 
