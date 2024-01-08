@@ -3,13 +3,7 @@ import {
   WINDOW_SUSPENSE_SYNC_DATA_KEY,
 } from "../../constants";
 
-// calls fetch only on server side; produces a enhanced promise
-export function wrap(fetch) {
-  if (typeof window === "undefined") return wrapForServerSide(fetch());
-  else return wrapForClientSide();
-}
-
-function innerWrap(promise) {
+export function wrap(promise) {
   const wrapped = {
     data: undefined,
     error: undefined,
@@ -30,11 +24,11 @@ function innerWrap(promise) {
   return wrapped;
 }
 
-function wrapForClientSide() {
+export function setUpForReceive() {
   // the below code runs on CLIENT
   // sets up a callback in window
   // also check to see if data has been delivered before hydration
-  return innerWrap(
+  return wrap(
     new Promise((resolve) => {
       const index = window[WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY].length;
       window[WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY][index] = resolve;
@@ -42,8 +36,4 @@ function wrapForClientSide() {
         resolve(window[WINDOW_SUSPENSE_SYNC_DATA_KEY][index]);
     }),
   );
-}
-
-function wrapForServerSide(promise) {
-  return innerWrap(promise);
 }

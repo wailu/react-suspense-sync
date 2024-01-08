@@ -10,6 +10,7 @@ const Dino = () => {
 
   useEffect(() => {
     console.log("Dino mounted~");
+    return () => console.log("Dino unmounted~");
   }, []);
 
   useEffect(() => {

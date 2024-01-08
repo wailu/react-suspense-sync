@@ -9,20 +9,9 @@ const port = 3000;
 app.use("/public", express.static(__dirname + "/public"));
 
 app.get("/", (_req, res) => {
-  const mockFetchCatData = new Promise((resolve) => {
-    setTimeout(() => {
-      resolve("The cat jumps over the lazy cow");
-    }, 2000);
+  const { pipe } = renderToPipeableStream(React.createElement(App.default), {
+    bootstrapModules: ["public/index.js"],
   });
-
-  const { pipe } = renderToPipeableStream(
-    React.createElement(App.default, {
-      asyncData: { mockFetchCatData },
-    }),
-    {
-      bootstrapScripts: ["public/bundle.js"],
-    },
-  );
 
   pipe(res);
 });

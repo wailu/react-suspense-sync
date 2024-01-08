@@ -1,6 +1,12 @@
-import React, { createContext, useContext, useState, Suspense } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useEffect,
+  Suspense,
+} from "react";
 import { PropTypes } from "prop-types";
-import { wrap } from "./utils/wrap";
+import { wrap, setUpForReceive } from "./utils/wrap";
 import {
   WINDOW_SUSPENSE_SYNC_CALLBACKS_KEY,
   WINDOW_SUSPENSE_SYNC_DATA_KEY,
@@ -8,16 +14,36 @@ import {
 
 const SuspenseSyncContext = createContext([]);
 
-const fetchs = [];
+const fetches = [];
 
-export function createSuspenseSyncHook(f) {
-  const i = fetchs.length;
+export function createSuspenseSyncHook(fetch) {
   // register fetch
-  fetchs.push(f);
+  // when registered on server side fetch will be made on server side
+  // note that on server side only the initial render matters
+  // that means that if the initial render did not import the component due to code spliting,
+  // the fetch call will not be made on server side
+  const i = fetches.length;
+  fetches.push(fetch);
+
+  if (typeof window !== "undefined") {
+    let p = undefined;
+
+    return () => {
+      // client side hook
+      // promises[i] might be undefined if the initial render did not import the component using the hook
+      // in this case, this means that the fetch call needs to be made on the client side
+      const promises = useContext(SuspenseSyncContext);
+      p = p ?? promises[i];
+
+      if (!p) p = wrap(fetch());
+      if (p.status === "pending") throw p;
+      if (p.status === "completed") return p.data;
+    };
+  }
 
   return () => {
-    // TODO: detect if we're to do csr
-    // if so we fetch instead of waiting on server data
+    // server side hook
+    // promises[i] is guaranteed here to exist
     const promises = useContext(SuspenseSyncContext);
     const p = promises[i];
 
@@ -58,9 +84,16 @@ SuspenseSyncScript.propTypes = {
 };
 
 export function SuspenseSync({ children }) {
-  // note: we expect the function passed to useState to only execute once
-  // this makes it that we only call f once
-  const [promises] = useState(() => fetchs.map((f) => wrap(f)));
+  // on server side all api calls are fired
+  // on client side the mechanism is set up to receive data when api calls resolve
+  const promises = useMemo(
+    () =>
+      fetches.map((f) => {
+        if (typeof window === "undefined") return wrap(f());
+        else return setUpForReceive();
+      }),
+    [],
+  );
 
   return (
     <SuspenseSyncContext.Provider value={promises}>
