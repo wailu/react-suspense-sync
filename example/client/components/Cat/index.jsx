@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
-import { useSuspenseSync } from "../../../index";
+import { fetchCatData } from "./fetch";
+import { createSuspenseSyncHook } from "../../../../index";
+
+const useSuspenseSyncDino = createSuspenseSyncHook(fetchCatData);
 
 const Cat = () => {
-  const data = useSuspenseSync("mockFetchCatData");
+  const data = useSuspenseSyncDino();
 
   useEffect(() => {
     console.log("Cat mounted~");
