@@ -8,7 +8,8 @@
     "start": "npm run build && node app/index.js",
     "build": "npm run build-for-server && npm run build-for-client",
     "build-for-server": "rimraf app/views && esbuild client/containers/App.jsx --bundle --platform=node --external:react --outfile=app/views/App.js",
-    "build-for-client": "rimraf app/public && esbuild client/index.jsx --bundle --splitting --outdir=app/public --format=esm"
+    "build-for-client": "rimraf app/public && esbuild client/index.jsx --bundle --outfile=app/public/index.js",
+    "build-for-client-with-splitting": "rimraf app/public && esbuild client/index.jsx --bundle --splitting --outdir=app/public --format=esm"
   },
   "keywords": [],
   "author": "",

@@ -10,7 +10,9 @@ app.use("/public", express.static(__dirname + "/public"));
 
 app.get("/", (_req, res) => {
   const { pipe } = renderToPipeableStream(React.createElement(App.default), {
-    bootstrapModules: ["public/index.js"],
+    // please switch to bootstrapModules if using "build-for-client-with-splitting" option
+    // bootstrapModules: ["public/index.js"],
+    bootstrapScripts: ["public/index.js"],
   });
 
   pipe(res);
