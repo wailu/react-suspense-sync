@@ -149,7 +149,7 @@ https://github.com/wailu/react-syspense-sync/assets/42461097/820ecbb6-7165-49c8-
 
 5. (bonus) Try with esbuild's [code-splitting](https://esbuild.github.io/api/#splitting) feature
 
-Change the `"build"` field in `package.json`:
+Change the `"build"` field under `"scripts"` in `package.json`:
 
 ```
 {
