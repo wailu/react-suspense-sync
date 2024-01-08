@@ -29,39 +29,26 @@ However, one caveat is that the data fetching solution needs to be integrated wi
 
 React Suspense Sync provides a simple solution for your SSR react app to **fetch data on server and sync it to the client later on**, enabling you to start streaming HTML earlier to the client.
 
-### 1. Wrap with `<SuspenseSync>`
+### 1. Use `createSuspenseSyncHook` to create the hook to be used in your component
+
 ```
-import { SuspenseSync } from "react-suspense-sync";
-// ...
+import { createSuspenseSyncHook } from "react-suspense-sync";
 
-const App = ({ asyncData }) => {
-  return (
-    <html>
-      <head>
-        ...
-      </head>
-      <body>
-        {/* wrap with SuspenseSync; pass asyncData to SuspenseSync */}
-        <SuspenseSync asyncData={asyncData}>
-          <Suspense fallback="loading cat... (the promise takes 2s to resolve on the server)">
-            <Cat />
-          </Suspense>
-        </SuspenseSync>
-      </body>
-    </html>
-  );
-};
+const fetchCatData = () => {
+  // do data fetching here, and return a promise that resolves to your data
+  return promise;
+}
 
-export default App;
+export const useSuspenseSyncCat = createSuspenseSyncHook(fetchCatData);
 ```
 
-### 2. Use the `useSuspenseSync` hook in components dependent on the data
+### 2. Use the created hook in your component
+
 ```
-import { useSuspenseSync } from "react-suspense-sync";
-// ...
+import { useSuspenseSyncCat } from "./hooks";
 
 const Cat = () => {
-  const data = useSuspenseSync("mockFetchCatData");
+  const data = useSuspenseSyncCat();
 
   useEffect(() => {
     console.log("Cat mounted~");
@@ -78,27 +65,43 @@ const Cat = () => {
 export default Cat;
 ```
 
-### 3. Initiate data fetching on the server and pass promises to your App
+### 3. Use your component within `<SuspenseSync>`
+
+```
+import { SuspenseSync } from "react-suspense-sync";
+// ...
+
+const App = () => {
+  return (
+    <html>
+      <head>
+        ...
+      </head>
+      <body>
+        {/* wrap with SuspenseSync */}
+        <SuspenseSync>
+          <Suspense fallback="loading cat...">
+            <Cat />
+          </Suspense>
+        </SuspenseSync>
+      </body>
+    </html>
+  );
+};
+
+export default App;
+```
+
+### 4. Use in SSR
 
 > Note: `renderToString` does not support streaming or waiting for data; you'll need to use an appropriate [streaming method](https://react.dev/reference/react-dom/server/renderToString#migrating-from-rendertostring-to-a-streaming-method-on-the-server) on the server
 
 On the server (learn more from the [official react docs](https://react.dev/reference/react-dom/server/renderToPipeableStream#rendering-a-react-tree-as-html-to-a-nodejs-stream)):
+
 ```
 app.get("/", (_req, res) => {
-  // choose your own data fetching strategy here
-  // have it return a promise that resolves to the data
-  // notice that we are not awaiting the promise
-  const mockFetchCatData = new Promise((resolve) => {
-    setTimeout(() => {
-      resolve("The cat jumps over the lazy cow");
-    }, 2000);
-  });
-
-  // pass promise(s) to App via the asyncData prop (only required on the server)
   const { pipe } = renderToPipeableStream(
-    React.createElement(App.default, {
-      asyncData: { mockFetchCatData },
-    }),
+    React.createElement(App.default),
     {
       // add the script that hydrates the server-generated HTML
       bootstrapScripts: ["public/bundle.js"],
@@ -109,7 +112,7 @@ app.get("/", (_req, res) => {
 });
 ```
 
-And how your hydration script should approximately look like:
+Your hydration script should approximately look like:
 
 ```
 import React from "react";
@@ -117,11 +120,11 @@ import { hydrateRoot } from "react-dom/client";
 
 import App from "./App";
 
-// note that you do not need to pass asyncData here!
 hydrateRoot(document, <App />);
 ```
 
 ## Running the example app
+
 1. Clone this repository
 
 ```
@@ -136,7 +139,7 @@ cd example && npm i
 ```
 
 3. Start the app
-   
+
 ```
 npm run start
 ```
@@ -146,6 +149,33 @@ This will automatically build the app and start the server.
 4. Go to http://localhost:3000/
 
 https://github.com/wailu/react-syspense-sync/assets/42461097/820ecbb6-7165-49c8-a073-c4570efa9c8e
+
+5. (bonus) Try with es-build code-splitting
+
+Change the `"build"` field in `package.json`:
+
+```
+{
+  // ...
+  scripts: {
+    // ...
+    "build": "npm run build-for-server && npm run build-for-client-with-splitting",
+    // ...
+  }
+}
+```
+
+And switch to use `bootstrapModules` instead:
+
+```
+app.get("/", (_req, res) => {
+  const { pipe } = renderToPipeableStream(React.createElement(App.default), {
+    bootstrapModules: ["public/index.js"],
+  });
+
+  pipe(res);
+});
+```
 
 ## TODO
 
