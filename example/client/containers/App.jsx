@@ -6,7 +6,7 @@ import { SuspenseSync } from "../../../index";
 const Dino = lazy(() => import("../components/Dino"));
 
 const App = () => {
-  const [flag, setFlag] = useState(false);
+  const [flag, setFlag] = useState(true);
 
   return (
     <html>

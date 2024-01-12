@@ -1,6 +1,6 @@
 export default async function fetchDinoData() {
-  console.log("fetchDinoData");
+  console.log("fetchDinoData called");
   return new Promise((resolve) => {
-    setTimeout(() => resolve("rawr!"), 1000);
+    setTimeout(() => resolve("rawr!"), 5000);
   });
 }

@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import { fetchCatData } from "./fetch";
 import { createSuspenseSyncHook } from "../../../../index";
 
-const useSuspenseSyncDino = createSuspenseSyncHook(fetchCatData);
+const useSuspenseSyncCat = createSuspenseSyncHook(fetchCatData);
 
 const Cat = () => {
-  const data = useSuspenseSyncDino();
+  const data = useSuspenseSyncCat();
 
   useEffect(() => {
     console.log("Cat mounted~");
